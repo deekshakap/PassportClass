@@ -1,0 +1,229 @@
+package programs;
+
+/**
+ * This class represents a person's passport. It has three instance variables
+ * representing the first, last and middle name (all are String variables). A
+ * character instance variable representing a separator (to be used for
+ * formatting purposes) is also part of the class. In addition, the class has a
+ * StringBuffer instance variable that represents the passport stamps the person
+ * has received.
+ * 
+ * For this class you need to define and use a private method called
+ * validateAndFormat that takes a character as a parameter.
+ * 
+ * The class will keep track of the number of instances created by using a
+ * private static field called objectCount.
+ * 
+ * @author CS
+ *
+ */
+public class Passport { 
+	//instance variables 
+	private String firstname;
+	private String middlename;
+	private String lastname;
+	private StringBuffer s;
+	private char separator;
+	//tracks number of objects of Passport class
+	private static int objectCount = 0;
+	
+	public Passport(String firstname, String middlename, String lastname) {
+		//default separator
+		this.separator = ',';
+		//checks first + last names
+		if(firstname == null || lastname == null) {
+			return;
+		}
+		else {
+			this.firstname = validateAndFormat(firstname);
+			this.lastname = validateAndFormat(lastname);
+		}
+		//checks middle name using validateAndFormat
+		if (middlename == null || middlename.isBlank()) {
+			this.middlename = "";
+		}
+		else {
+			this.middlename = validateAndFormat(middlename);
+		}
+		//initializes stamp StringBuffer
+		this.s = new StringBuffer();
+		//increments object count 
+		objectCount++;
+		}
+
+	public String toString() {
+		//checks if middlename is blank or null
+		if (middlename == null || middlename.isBlank()) {
+			//formats output accordingly
+			return this.lastname + this.separator + this.firstname;
+		}
+		else {
+			//formats accordingly if middlename is not null or blank
+			return this.lastname + this.separator + this.firstname + this.separator + this.middlename;
+		}
+	}
+
+	public Passport(String firstname, String lastname) {
+		//validates the first and last name and adds an empty string for the middlename
+		this(validateAndFormat(firstname), "", validateAndFormat(lastname));
+	}
+
+	public Passport() {
+		//passport object with provided constraints
+		this("SAMPLEFIRSTNAME", "SAMPLEMIDDLENAME", "SAMPLELASTNAME");
+	}
+
+	public Passport(Passport passport) {
+		//initializes current object with provided constraints
+		this(passport.firstname, passport.middlename, passport.lastname);
+		this.s = new StringBuffer(passport.s);
+		this.separator = passport.separator;
+		objectCount++;
+	}
+
+	public Passport addStamp(String stamp) {
+		//stamp will not be added if parameter is null or blank
+		if (validateAndFormat(stamp) == null || validateAndFormat(stamp).isBlank()) {
+			 return this;
+		}
+		else {
+			//adds stamp to StringBuffer and turns in into an acceptable format
+			s.append(validateAndFormat(stamp));
+			return this;
+		}
+	}
+
+	public StringBuffer getStamps() {
+		//returns copy
+		return new StringBuffer(s);
+	}
+
+	public char getSeparator() {
+		//provides current separator
+		return this.separator;
+	}
+
+	public boolean setSeparator(char separator) {
+		//ensures separator is valid according to constraints
+		if(separator == '@' || Character.isSpaceChar(separator) || Character.isLetter(separator)) {
+			return false;
+		}
+		//checks if current separator is the same as the one provided
+		if (this.separator == separator) {
+			return true;
+		}
+		this.separator = separator;
+		return true;
+	}
+
+	public boolean equals(Object obj) {
+		//checks to see if current object and obj are the same
+		if (this == obj) {
+			return true;
+		}
+		//checks to see is obj follows constraints provided
+		else if (obj == null || this.getClass() != obj.getClass()) {
+			return false;
+		}
+		//compares the two objects 
+		else {
+		Passport other = (Passport) obj;
+		return (this.firstname.equals(other.firstname)) && (this.lastname.equals(other.lastname)) && (this.middlename.equals(other.middlename));
+		}
+	}
+	
+	public int compareTo(Passport passport) {
+		//compares lastnames
+		int lastNameComparison = this.lastname.compareToIgnoreCase(passport.lastname);
+		//returns if last names are not the same 
+		if (lastNameComparison != 0) {
+			return lastNameComparison;
+		}
+		//compares firstnames
+		int firstNameComparison = this.firstname.compareToIgnoreCase(passport.firstname);
+		//returns if firstnames are not the same
+		if (firstNameComparison != 0) {
+			return firstNameComparison;
+		}
+		//compares middles names and returns the comparison
+		int middleNameComparison = this.middlename.compareToIgnoreCase(passport.middlename);
+		return middleNameComparison;
+	
+		}
+
+
+	public static int getNumberOfPassportObjects() {
+		//returns current number of objects 
+		return objectCount;
+	}
+
+	public static void resetNumberOfPassportObjects() {
+		//sets the object counter to 0
+		objectCount = 0;
+	}
+
+	public static Passport normalize(Passport passport, boolean uppercase) {
+	   //checks to ensure passport is valid object 
+	   if (passport == null) {
+			return null;
+		}
+	   //new object of Passport holdPassport is created with the names that are belonging
+	   Passport holdPassport = new Passport();
+		    //if true then first + middle + last names are set to uppercase format
+			if (uppercase == true) {
+				holdPassport.firstname = passport.firstname.toUpperCase();
+				holdPassport.lastname = passport.lastname.toUpperCase();
+				holdPassport.middlename = passport.middlename.toUpperCase();
+			}
+			//if false then first + middle + last names are set to lowercase format
+			else {
+				holdPassport.firstname = passport.firstname.toLowerCase();
+				holdPassport.lastname = passport.lastname.toLowerCase();
+				holdPassport.middlename = passport.middlename.toLowerCase();
+			}
+		//sets the separator 
+		holdPassport.separator = passport.separator;
+		return holdPassport;
+		}
+
+
+	public boolean changeLastname(String lastname) {
+		String holdLastName = validateAndFormat(lastname);
+		//checks to see if the lastname is valid 
+		if(holdLastName != null) {
+			this.lastname = holdLastName;
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	/*
+	 * This method will generate and return a formatted string in lowercase with the
+	 * first character in uppercase. The parameter is valid if it is not null and it
+	 * is not blank according to the string method isBlank(). If the parameter is
+	 * invalid, the method will return null and perform no further processing. If
+	 * the parameter is valid, spaces surrounding the parameter will be removed, the
+	 * string will be converted to lowercase, and the first character of the string
+	 * (after spaces have been removed) will be in upper case. The following methods
+	 * can be helpful during the implementation of this method:
+	 * Character.toUpperCase, and the string methods charAt and substring.
+	 * 
+	 * You can test this method by initially defining it public; once you have
+	 * tested it, make it private.
+	 * 
+	 */
+	private static String validateAndFormat(String name) {
+		//checks to see if name is not null or blank 
+		if (name == null || name.isBlank()) {
+			return null;
+		}
+		//takes out any unwanted space with trim and turns all the name string to lower case
+		String hold = name.trim().toLowerCase();
+		//turns firstletter from lowercase to uppercase
+		char firstLetter = Character.toUpperCase(hold.charAt(0));
+		//returns first letter and the rest of the lowercase substring in appropriate format
+		return firstLetter + hold.substring(1);
+		}
+		
+	}
